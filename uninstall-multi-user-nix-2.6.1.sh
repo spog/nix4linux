@@ -5,6 +5,7 @@ if [ "x${1}" != "xlogged" ]; then
 	script -c "$0 logged $@" $LOGFILE
 	exit $?
 fi
+shift
 
 echo
 echo "!!!WARNING!!!"

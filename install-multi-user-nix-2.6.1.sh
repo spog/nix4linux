@@ -5,6 +5,7 @@ if [ "x${1}" != "xlogged" ]; then
 	script -c "$0 logged $@" $LOGFILE
 	exit $?
 fi
+shift
 
 NIX_VERSION=$(basename $0 .sh | sed -e 's/[^-]*-//g')
 INSTALLER_NAME="install-nix-${NIX_VERSION}"
