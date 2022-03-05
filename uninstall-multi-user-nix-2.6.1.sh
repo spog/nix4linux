@@ -1,8 +1,10 @@
 #!/bin/bash
 
-readonly LOGFILE=$(basename $0 .sh).log
-touch $LOGFILE
-exec &> >(tee $LOGFILE)
+if [ "x${1}" != "xlogged" ]; then
+	readonly LOGFILE=$(basename $0 .sh).log
+	script -c "$0 logged $@" $LOGFILE
+	exit $?
+fi
 
 echo
 echo "!!!WARNING!!!"

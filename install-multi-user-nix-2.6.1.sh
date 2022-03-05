@@ -1,12 +1,14 @@
 #!/bin/bash
 
-NIX_VERSION="2.6.1"
+if [ "x${1}" != "xlogged" ]; then
+	readonly LOGFILE=$(basename $0 .sh).log
+	script -c "$0 logged $@" $LOGFILE
+	exit $?
+fi
+
+NIX_VERSION=$(basename $0 .sh | sed -e 's/[^-]*-//g')
 INSTALLER_NAME="install-nix-${NIX_VERSION}"
 INSTALLER_URL="https://releases.nixos.org/nix/nix-${NIX_VERSION}/install"
-
-readonly LOGFILE=$(basename $0 .sh).log
-touch $LOGFILE
-exec &> >(tee $LOGFILE)
 
 echo
 echo "!!!INFO (Nix-${NIX_VERSION})!!!"
