@@ -1,10 +1,11 @@
-This project provides my personal scripts to install and fully remove multi-
-user mode installation of the Nix package manager inside Ubuntu-18.04
+This project provides my personal scripts to install or fully remove multi-
+user mode installation of the Nix package manager inside the Ubuntu-18.04
 installation.
 
-Official Nix installation link:
+Official Nix installation URL:
 https://nixos.org/download.html#nix-install-linux
 
-WARNING!
+!!!WARNING!!!
+Use provided scripts at your own risk!
 The removal script removes all Nix related content including the 'nix store'
-and its database.
+and its database!
