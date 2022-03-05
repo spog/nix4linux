@@ -4,17 +4,19 @@ readonly LOGFILE=$(basename $0 .sh).log
 touch $LOGFILE
 exec &> >(tee $LOGFILE)
 
+echo
 echo "!!!WARNING!!!"
-echo "This script is going to completely remove multi-user NIX installation,"
-echo "including NIX store and database!"
+echo "This script is going to completely remove multi-user Nix package manager"
+echo "installation, including NIX store and its database!"
 echo
 echo -n "Do you really want to proceed (y/n)? "
 read INPUT
 if [ "x${INPUT}" != "xy" ]; then
 	echo
-	echo "Uninstall cancelled!"
+	echo "Uninstallation cancelled!"
 	exit 0
 fi
+echo
 set -x
 sudo systemctl disable nix-daemon.socket
 sudo systemctl disable nix-daemon.service
