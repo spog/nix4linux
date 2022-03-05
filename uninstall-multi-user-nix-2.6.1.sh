@@ -6,6 +6,7 @@ if [ "x${1}" != "xlogged" ]; then
 	exit $?
 fi
 shift
+trap 'exit' SIGINT
 
 echo
 echo "!!!WARNING!!!"

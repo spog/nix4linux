@@ -6,6 +6,7 @@ if [ "x${1}" != "xlogged" ]; then
 	exit $?
 fi
 shift
+trap 'exit' SIGINT
 
 NIX_VERSION=$(basename $0 .sh | sed -e 's/[^-]*-//g')
 INSTALLER_NAME="install-nix-${NIX_VERSION}"
