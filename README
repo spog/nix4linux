@@ -6,4 +6,5 @@ Official Nix installation link:
 https://nixos.org/download.html#nix-install-linux
 
 WARNING!
-The removal script removes all Nix related content including the 'nix store'.
+The removal script removes all Nix related content including the 'nix store'
+and its database.
