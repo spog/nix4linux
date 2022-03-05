@@ -8,23 +8,23 @@ readonly LOGFILE=$(basename $0 .sh).log
 touch $LOGFILE
 exec &> >(tee $LOGFILE)
 
-echo "!!!INFO!!!"
-echo "This script starts multi-user NIX installation process and collects"
-echo "its output to a log file!"
+echo
+echo "!!!INFO (Nix-${NIX_VERSION})!!!"
+echo "This script starts Nix package manger multi-user installation process"
+echo "and collects its output to a log file!"
 echo
 echo -n "Do you want to proceed (y/n)? "
 read INPUT
 if [ "x${INPUT}" != "xy" ]; then
 	echo
-	echo "Install cancelled!"
+	echo "Installation cancelled!"
 	exit 0
 fi
 
-# Get and verify the installer?
+echo
 if [ ! -f "./${INSTALLER_NAME}" ]; then
-	echo
 	echo "Installer not available!"
-	echo "Remove any signature and download new '${INSTALLER_URL}' to '${INSTALLER_NAME}'"
+	echo "Remove any signature and download new '${INSTALLER_URL}' to './${INSTALLER_NAME}':"
 	rm -f ./${INSTALLER_NAME}.asc
 	curl -o ./${INSTALLER_NAME} ${INSTALLER_URL}
 	ret=$?
@@ -33,10 +33,12 @@ if [ ! -f "./${INSTALLER_NAME}" ]; then
 		exit $ret
 	fi
 fi
+echo "Installer './${INSTALLER_NAME}' available!"
+echo
 if [ ! -f "./${INSTALLER_NAME}.asc" ]; then
 	echo
 	echo "Signature not available!"
-	echo "Download new '${INSTALLER_URL}.asc' to '${INSTALLER_NAME}.asc'"
+	echo "Download new '${INSTALLER_URL}.asc' to './${INSTALLER_NAME}.asc':"
 	curl -o ./${INSTALLER_NAME}.asc ${INSTALLER_URL}.asc
 	ret=$?
 	if [ $ret -ne 0 ]; then
@@ -52,7 +54,7 @@ if [ ! -f "./${INSTALLER_NAME}.asc" ]; then
 		exit $ret
 	fi
 fi
-
+echo "Signature './${INSTALLER_NAME}.asc' available!"
 echo
 echo "Verify the installer:"
 gpg2 --verify ./${INSTALLER_NAME}.asc
@@ -63,6 +65,6 @@ if [ $ret -ne 0 ]; then
 fi
 echo
 
-set -x
-sh ./${INSTALLER_NAME} --daemon
-
+echo "Run the installer"
+set -x; sh ./${INSTALLER_NAME} --daemon
+exit $?
