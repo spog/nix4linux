@@ -2,7 +2,9 @@
 
 if [ "x${1}" != "xlogged" ]; then
 	readonly LOGFILE=$(basename $0 .sh).log
-	script -c "$0 logged $@" $LOGFILE
+	# Restart the script through 'script' with parameter 'logged'
+	# to do the work:
+	script -e -c "$0 logged $@" $LOGFILE
 	exit $?
 fi
 shift
