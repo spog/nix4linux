@@ -3,7 +3,7 @@
 if [ "x${1}" != "xlogged" ]; then
 	readonly LOGFILE=$(basename $0 .sh).log
 	# Restart the script through 'script' with parameter 'logged'
-	# to do the work:
+        # to do the work:
 	script -e -c "$0 logged $@" $LOGFILE
 	exit $?
 fi
@@ -25,6 +25,13 @@ if [ "x${INPUT}" != "xy" ]; then
 	echo
 	echo "Installation cancelled!"
 	exit 0
+fi
+
+if [ "x$(which nix)" != "x" ]; then
+	echo
+	echo "Can not proceed!"
+	echo "Already installed: $(nix --version)"
+	exit 1
 fi
 
 echo
