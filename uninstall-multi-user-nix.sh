@@ -10,6 +10,15 @@ fi
 shift
 trap 'exit' SIGINT
 
+function exit_fn ()
+{
+	echo
+	exit $1
+}
+
+# Freshen the environment:
+source /etc/profile
+
 if [ "x$(which nix)" != "x" ]; then
 	echo
 	echo "!!!INFO: found '$(nix --version)'!!!"
@@ -17,8 +26,7 @@ if [ "x$(which nix)" != "x" ]; then
 else
 	echo
 	echo "!!!INFO: 'nix' not found (nothing to do)!!!"
-	echo
-	exit 0
+	exit_fn 0
 fi
 echo
 echo "!!!WARNING!!!"
@@ -30,8 +38,7 @@ read INPUT
 echo
 if [ "x${INPUT}" != "xy" ]; then
 	echo "Uninstallation cancelled!"
-	echo
-	exit 0
+	exit_fn 0
 fi
 
 set -x
@@ -82,4 +89,4 @@ sudo userdel nixbld30
 sudo userdel nixbld31
 sudo userdel nixbld32
 sudo groupdel nixbld
-exit 0
+exit_fn 0

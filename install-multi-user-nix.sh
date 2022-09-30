@@ -10,13 +10,21 @@ fi
 shift
 trap 'exit' SIGINT
 
+function exit_fn ()
+{
+	echo
+	exit $1
+}
+
+# Freshen the environment:
+source /etc/profile
+
 NIX_VERSION="${1}"
 if [ -z "${NIX_VERSION}" ]; then
 	echo
-	echo "ERROR: add single argument (the 'nix' version to install)!"
+	echo "Error: add single argument (the 'nix' version to install)!"
 	echo "You can find 'current' version here: https://nixos.org/download.html"
-	echo
-	exit 1
+	exit_fn 1
 fi
 INSTALLER_NAME="install-nix-${NIX_VERSION}"
 INSTALLER_URL="https://releases.nixos.org/nix/nix-${NIX_VERSION}/install"
@@ -26,9 +34,11 @@ echo "!!!INFO!!!"
 echo "You are about to install Nix package manager (version: ${NIX_VERSION})!"
 echo
 if [ "x$(which nix)" != "x" ]; then
-	echo "!!!WARNING: found installed '$(nix --version)'!!!"
+	echo "Error: found installed '$(nix --version)'!"
+	echo "Nix need to be uninstalled to proceed!"
+	exit_fn 1
 else
-	echo "Nix not found installed!"
+	echo "Nix seems not already installed - OK!"
 fi
 echo
 echo "This script starts Nix package manger multi-user installation process"
@@ -39,14 +49,7 @@ read INPUT
 if [ "x${INPUT}" != "xy" ]; then
 	echo
 	echo "Installation cancelled!"
-	exit 0
-fi
-
-if [ "x$(which nix)" != "x" ]; then
-	echo
-#	echo "Can not proceed!"
-#	echo "Already installed: $(nix --version)"
-#	exit 1
+	exit_fn 0
 fi
 
 echo
@@ -58,7 +61,7 @@ if [ ! -f "./${INSTALLER_NAME}" ]; then
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "Error: Installer download failed!"
-		exit $ret
+		exit_fn $ret
 	fi
 fi
 echo "Installer './${INSTALLER_NAME}' available!"
@@ -71,7 +74,7 @@ if [ ! -f "./${INSTALLER_NAME}.asc" ]; then
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "Error: Signature download failed!"
-		exit $ret
+		exit_fn $ret
 	fi
 	echo
 	echo "Receive GPG keys:"
@@ -79,7 +82,7 @@ if [ ! -f "./${INSTALLER_NAME}.asc" ]; then
 	ret=$?
 	if [ $ret -ne 0 ]; then
 		echo "Error: Receiveing GPG keys failed!"
-		exit $ret
+		exit_fn $ret
 	fi
 fi
 echo "Signature './${INSTALLER_NAME}.asc' available!"
@@ -89,10 +92,10 @@ gpg2 --verify ./${INSTALLER_NAME}.asc
 ret=$?
 if [ $ret -ne 0 ]; then
 	echo "Error: Installer verificaion failed!"
-	exit $ret
+	exit_fn $ret
 fi
 echo
 
 echo "Run the installer"
 set -x; sh ./${INSTALLER_NAME} --daemon
-exit $?
+exit_fn $?
