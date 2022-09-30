@@ -12,7 +12,7 @@ trap 'exit' SIGINT
 
 function exit_fn ()
 {
-	echo
+	set +x; echo
 	exit $1
 }
 
