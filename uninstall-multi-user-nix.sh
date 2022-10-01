@@ -1,10 +1,43 @@
 #!/bin/bash
 
 if [ "x${1}" != "xlogged" ]; then
-	readonly LOGFILE=$(basename $0 .sh).log
+	if [ "x${1}" != "xinit" ]; then
+		# Freshen the environment:
+		source /etc/profile
+		if [ "x$(which nix)" != "x" ]; then
+			export NIX_VERSION=$(nix --version | sed -e 's/.* //g')
+		fi
+		# Restart the script through 'script' with parameter 'logged'
+		# to do the work:
+		script -q -e -c "$0 init $@"
+		if [ $? -ne 0 ]; then
+			exit $?
+		fi
+	else
+		if [ -z "${NIX_VERSION}" ]; then
+			echo "'nix' not found (nothing to do)!"
+			exit 1
+		fi
+		echo "Found 'nix' (version: ${NIX_VERSION})!"
+		echo
+		echo "!!!WARNING!!!"
+		echo "This script is going to completely remove multi-user Nix package manager"
+		echo "installation, including NIX store and its database!"
+		echo
+		echo -n "Do you really want to proceed (y/n)? "
+		read INPUT
+		if [ "x${INPUT}" != "xy" ]; then
+			echo "Uninstallation cancelled!"
+			exit 1
+		fi
+		exit 0
+	fi
+
+	readonly LOGFILE=$(basename $0 .sh)-${NIX_VERSION}.log
+	mv -f typescript $LOGFILE
 	# Restart the script through 'script' with parameter 'logged'
 	# to do the work:
-	script -e -c "$0 logged $@" $LOGFILE
+	script -a -e -c "$0 logged $@" $LOGFILE
 	exit $?
 fi
 shift
@@ -15,31 +48,6 @@ function exit_fn ()
 	set +x; echo
 	exit $1
 }
-
-# Freshen the environment:
-source /etc/profile
-
-if [ "x$(which nix)" != "x" ]; then
-	echo
-	echo "!!!INFO: found '$(nix --version)'!!!"
-#	echo "Found installed: $(nix --version)"
-else
-	echo
-	echo "!!!INFO: 'nix' not found (nothing to do)!!!"
-	exit_fn 0
-fi
-echo
-echo "!!!WARNING!!!"
-echo "This script is going to completely remove multi-user Nix package manager"
-echo "installation, including NIX store and its database!"
-echo
-echo -n "Do you really want to proceed (y/n)? "
-read INPUT
-echo
-if [ "x${INPUT}" != "xy" ]; then
-	echo "Uninstallation cancelled!"
-	exit_fn 0
-fi
 
 set -x
 sudo systemctl stop nix-daemon.socket
