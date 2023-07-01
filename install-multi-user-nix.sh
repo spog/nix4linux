@@ -62,7 +62,7 @@ INSTALLER_URL="https://releases.nixos.org/nix/nix-${NIX_VERSION}/install"
 
 echo
 if [ ! -f "./${INSTALLER_NAME}" ]; then
-	echo "Installer not available!"
+	echo "Installer not yet available!"
 	echo "Remove any signature and download new '${INSTALLER_URL}' to './${INSTALLER_NAME}':"
 	rm -f ./${INSTALLER_NAME}.asc
 	curl -o ./${INSTALLER_NAME} ${INSTALLER_URL}
@@ -76,7 +76,7 @@ echo "Installer './${INSTALLER_NAME}' available!"
 echo
 if [ ! -f "./${INSTALLER_NAME}.asc" ]; then
 	echo
-	echo "Signature not available!"
+	echo "Signature not yet available!"
 	echo "Download new '${INSTALLER_URL}.asc' to './${INSTALLER_NAME}.asc':"
 	curl -o ./${INSTALLER_NAME}.asc ${INSTALLER_URL}.asc
 	ret=$?
@@ -95,12 +95,30 @@ if [ ! -f "./${INSTALLER_NAME}.asc" ]; then
 fi
 echo "Signature './${INSTALLER_NAME}.asc' available!"
 echo
-echo "Verify the installer:"
+echo "Verify the installer with signature:"
 gpg2 --verify ./${INSTALLER_NAME}.asc
 ret=$?
 if [ $ret -ne 0 ]; then
-	echo "error: Installer verificaion failed!"
-	exit_fn $ret
+	echo "error: Installer verificaion with signature failed!"
+	if [ ! -f "./${INSTALLER_NAME}.sha256" ]; then
+		echo
+		echo "SHA-256 hash not yet available!"
+		echo "Download new '${INSTALLER_URL}.sha256' to './${INSTALLER_NAME}.sha256':"
+		curl -o ./${INSTALLER_NAME}.sha256 ${INSTALLER_URL}.sha256
+		ret=$?
+		if [ $ret -ne 0 ]; then
+			echo "error: SHA-256 hash download failed!"
+			exit_fn $ret
+		fi
+	fi
+	cp -f ./${INSTALLER_NAME}.sha256 ./${INSTALLER_NAME}.sha256-check
+	echo "	./${INSTALLER_NAME}" >> ./${INSTALLER_NAME}.sha256-check
+	echo "Verify the installer with SHA-256 hash:"
+	sha256sum --check ./${INSTALLER_NAME}.sha256-check
+	ret=$?
+	if [ $ret -ne 0 ]; then
+		exit_fn $ret
+	fi
 fi
 echo
 
